@@ -1,0 +1,65 @@
+import tkinter as tk
+import random
+
+class HangmanGame:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Hangman Game")
+        self.word_list = ["PYTHON", "JAVA", "RUBY", "PHP", "HTML", "CSS", "JAVASCRIPT"]
+        self.secret_word = random.choice(self.word_list)
+        self.guesses = []
+        self.attempts = 6
+        self.masked_word = ["_"] * len(self.secret_word)
+
+        self.title_label = tk.Label(master, text="Hangman Game", font=("Arial", 24))
+        self.title_label.grid(row=0, column=0, columnspan=3, pady=10)
+
+        self.attempts_label = tk.Label(master, text=f"Attempts left: {self.attempts}", font=("Arial", 16))
+        self.attempts_label.grid(row=1, column=0, columnspan=3, pady=5)
+
+        self.word_label = tk.Label(master, text=" ".join(self.masked_word), font=("Arial", 20))
+        self.word_label.grid(row=2, column=0, columnspan=3, pady=10)
+
+        self.input_entry = tk.Entry(master, font=("Arial", 16))
+        self.input_entry.grid(row=3, column=0, columnspan=2, padx=5)
+
+        self.guess_button = tk.Button(master, text="Guess", font=("Arial", 16), command=self.check_guess)
+        self.guess_button.grid(row=3, column=2, padx=5)
+
+    def check_guess(self):
+        guess = self.input_entry.get().upper()
+        self.input_entry.delete(0, tk.END)
+
+        if guess in self.guesses:
+            return
+
+        self.guesses.append(guess)
+
+        if guess in self.secret_word:
+            for i, letter in enumerate(self.secret_word):
+                if letter == guess:
+                    self.masked_word[i] = guess
+            self.word_label.config(text=" ".join(self.masked_word))
+        else:
+            self.attempts -= 1
+            self.attempts_label.config(text=f"Attempts left: {self.attempts}")
+            if self.attempts == 0:
+                self.game_over()
+
+        if "_" not in self.masked_word:
+            self.game_won()
+
+    def game_over(self):
+        self.word_label.config(text=self.secret_word)
+        self.attempts_label.config(text="Game Over! You Lost.")
+
+    def game_won(self):
+        self.attempts_label.config(text="Congratulations! You Won.")
+
+def main():
+    root = tk.Tk()
+    hangman_game = HangmanGame(root)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
